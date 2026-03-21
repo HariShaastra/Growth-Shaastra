@@ -1,0 +1,74 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Stores user identity, vision, and mission statements.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "identityStatement": { "type": "string", "description": "The core identity statement" },
+        "vision": { "type": "string", "description": "Long-term vision" },
+        "mission": { "type": "string", "description": "Life mission" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "streak": { "type": "integer", "description": "Current daily ritual streak" },
+        "lastRitualDate": { "type": "string", "description": "Last date the ritual was completed (YYYY-MM-DD)" }
+      },
+      "required": ["uid", "identityStatement"]
+    },
+    "Goal": {
+      "title": "Goal",
+      "description": "Measurable goals linked to identity.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "targetDate": { "type": "string", "format": "date" },
+        "status": { "type": "string", "enum": ["active", "completed", "archived"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "status"]
+    },
+    "RitualLog": {
+      "title": "Daily Ritual Log",
+      "description": "Tracks completion of the daily ritual steps.",
+      "type": "object",
+      "properties": {
+        "date": { "type": "string", "description": "YYYY-MM-DD" },
+        "stepsCompleted": { "type": "array", "items": { "type": "string" } },
+        "reflection": { "type": "string" },
+        "actedAccordingToIdentity": { "type": "boolean" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["date", "stepsCompleted"]
+    },
+    "LifeStory": {
+      "title": "Life Story",
+      "description": "Narrative career and life path.",
+      "type": "object",
+      "properties": {
+        "content": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile and core statements"
+    },
+    "/users/{userId}/goals/{goalId}": {
+      "schema": "Goal",
+      "description": "User's specific goals"
+    },
+    "/users/{userId}/rituals/{date}": {
+      "schema": "RitualLog",
+      "description": "Daily ritual completion logs"
+    },
+    "/users/{userId}/stories/main": {
+      "schema": "LifeStory",
+      "description": "The user's future life story"
+    }
+  }
+}

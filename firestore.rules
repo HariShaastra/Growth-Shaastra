@@ -1,0 +1,148 @@
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+//
+// Collection: users
+// Document ID: userId (Auth UID)
+// Fields:
+//   - uid: string (required) - Firebase Auth UID
+//   - displayName: string (optional) - User's name
+//   - email: string (optional) - User's email
+//   - identityStatement: string (required) - Core identity
+//   - vision: string (optional) - Long-term vision
+//   - mission: string (optional) - Life mission
+//   - streak: number (optional) - Current streak
+//   - lastRitualDate: string (optional) - YYYY-MM-DD
+//   - createdAt: timestamp (required) - Creation time
+//
+// Collection: users/{userId}/goals
+// Document ID: goalId
+// Fields:
+//   - title: string (required) - Goal title
+//   - description: string (optional) - Goal details
+//   - targetDate: string (optional) - YYYY-MM-DD
+//   - status: string (required) - active, completed, archived
+//   - createdAt: timestamp (required) - Creation time
+//
+// Collection: users/{userId}/rituals
+// Document ID: date (YYYY-MM-DD)
+// Fields:
+//   - date: string (required) - YYYY-MM-DD
+//   - stepsCompleted: list (required) - List of step IDs
+//   - reflection: string (optional) - Daily reflection
+//   - actedAccordingToIdentity: bool (optional) - Accountability check
+//   - timestamp: timestamp (required) - Log time
+//
+// Collection: users/{userId}/stories
+// Document ID: main
+// Fields:
+//   - content: string (required) - The life story
+//   - updatedAt: timestamp (required) - Last update time
+//
+// ===============================================================
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "hari310804@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    function isValidDateString(dateStr) {
+      return dateStr is string && dateStr.matches("^\\d{4}-\\d{2}-\\d{2}$");
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidUser(data) {
+      return hasRequiredFields(['uid', 'identityStatement']) &&
+             data.uid == request.auth.uid &&
+             data.identityStatement is string && data.identityStatement.size() < 2000 &&
+             (!('email' in data) || isValidEmail(data.email)) &&
+             (!('streak' in data) || data.streak is number) &&
+             (!('vision' in data) || data.vision is string) &&
+             (!('mission' in data) || data.mission is string);
+    }
+
+    function isValidGoal(data) {
+      return hasRequiredFields(['title', 'status']) &&
+             data.title is string && data.title.size() > 0 && data.title.size() < 200 &&
+             data.status in ['active', 'completed', 'archived'] &&
+             (!('description' in data) || data.description is string) &&
+             (!('targetDate' in data) || isValidDateString(data.targetDate));
+    }
+
+    function isValidRitualLog(data) {
+      return hasRequiredFields(['date', 'stepsCompleted']) &&
+             isValidDateString(data.date) &&
+             data.stepsCompleted is list && data.stepsCompleted.size() <= 10 &&
+             (!('reflection' in data) || data.reflection is string && data.reflection.size() < 5000);
+    }
+
+    function isValidStory(data) {
+      return hasRequiredFields(['content']) &&
+             data.content is string && data.content.size() < 50000;
+    }
+
+    // ===============================================================
+    // Match Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data);
+      allow delete: if isAdmin();
+
+      match /goals/{goalId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidGoal(request.resource.data);
+        allow update: if isOwner(userId) && isValidGoal(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+
+      match /rituals/{date} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidRitualLog(request.resource.data);
+        allow update: if isOwner(userId) && isValidRitualLog(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+
+      match /stories/{storyId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidStory(request.resource.data);
+        allow update: if isOwner(userId) && isValidStory(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+    }
+  }
+}
