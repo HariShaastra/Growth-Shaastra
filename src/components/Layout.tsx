@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
 import { useAuth } from '../AuthContext';
 import { logout } from '../firebase';
+import { Logo } from './Logo';
 import { cn } from '../lib/utils';
 import { 
   LayoutDashboard, 
-  Target, 
-  BookOpen, 
+  Zap, 
+  Rocket, 
+  BookMarked,
   User as UserIcon, 
   LogOut, 
   Menu, 
   X, 
   Shield,
-  History,
-  Settings
+  Settings,
+  Flame
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -26,11 +28,12 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTa
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
-    { id: 'identity', label: 'Identity & Vision', icon: <Shield className="w-5 h-5" /> },
-    { id: 'goals', label: 'Goal Structuring', icon: <Target className="w-5 h-5" /> },
-    { id: 'story', label: 'Life Story', icon: <BookOpen className="w-5 h-5" /> },
-    { id: 'history', label: 'Ritual History', icon: <History className="w-5 h-5" /> },
+    { id: 'dashboard', label: 'Home', icon: <LayoutDashboard className="w-5 h-5" /> },
+    { id: 'life', label: 'Daily Ritual', icon: <Shield className="w-5 h-5" /> },
+    { id: 'atomic', label: 'Habits', icon: <Zap className="w-5 h-5" /> },
+    { id: 'karya', label: 'Projects', icon: <Rocket className="w-5 h-5" /> },
+    { id: 'book', label: 'Reading', icon: <BookMarked className="w-5 h-5" /> },
+    { id: 'settings', label: 'Setup', icon: <Settings className="w-5 h-5" /> },
   ];
 
   const handleNavClick = (id: string) => {
@@ -39,74 +42,77 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTa
   };
 
   return (
-    <div className="min-h-screen bg-stone-50 flex flex-col md:flex-row">
+    <div className="min-h-screen bg-[#1c1917] flex flex-col md:flex-row overflow-x-hidden">
       {/* Mobile Header */}
-      <header className="md:hidden bg-white border-b border-stone-200 p-4 flex items-center justify-between sticky top-0 z-50">
+      <header className="md:hidden bg-[#1c1917]/80 backdrop-blur-md border-b border-stone-800 p-4 flex items-center justify-between sticky top-0 z-50">
         <div className="flex items-center gap-2">
-          <Shield className="w-6 h-6 text-stone-900" />
-          <span className="font-serif font-bold text-lg tracking-tight">Life Shaastra</span>
+          <Logo className="w-8 h-8" />
+          <span className="font-display font-bold text-lg tracking-tight text-[#f5f5f4]">Growth Shaastra</span>
         </div>
-        <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+        <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-[#f5f5f4]">
           {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </header>
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed inset-0 z-40 bg-white md:relative md:flex md:flex-col md:w-72 border-r border-stone-200 transition-transform duration-300",
+        "fixed inset-0 z-40 bg-[#1c1917] md:relative md:flex md:flex-col md:w-72 border-r border-stone-800 transition-transform duration-300",
         mobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
       )}>
         <div className="hidden md:flex items-center gap-3 p-8 mb-4">
-          <div className="w-10 h-10 bg-stone-900 rounded-xl flex items-center justify-center text-white shadow-lg">
-            <Shield className="w-6 h-6" />
-          </div>
-          <span className="font-serif font-bold text-xl tracking-tight">Life Shaastra</span>
+          <Logo className="w-10 h-10" />
+          <span className="font-display font-bold text-xl tracking-tight text-white">Growth Shaastra</span>
         </div>
 
-        <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
+        <nav className="flex-1 px-4 space-y-2 overflow-y-auto">
           {navItems.map(item => (
             <button
               key={item.id}
               onClick={() => handleNavClick(item.id)}
               className={cn(
-                "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium",
+                "w-full flex items-center gap-4 px-5 py-4 rounded-3xl transition-all duration-300 font-medium",
                 activeTab === item.id 
-                  ? "bg-stone-900 text-white shadow-md shadow-stone-200" 
-                  : "text-stone-500 hover:bg-stone-100 hover:text-stone-900"
+                  ? "bg-amber-600 text-white shadow-xl shadow-amber-900/40" 
+                  : "text-stone-400 hover:bg-stone-800 hover:text-amber-400"
               )}
             >
-              {item.icon}
+              <span className={cn("transition-colors", activeTab === item.id ? "text-white" : "text-stone-500")}>
+                {item.icon}
+              </span>
               {item.label}
             </button>
           ))}
         </nav>
 
-        <div className="p-4 mt-auto border-t border-stone-100">
-          <div className="flex items-center gap-3 p-3 mb-4">
-            <div className="w-10 h-10 bg-stone-100 rounded-full flex items-center justify-center text-stone-600 border border-stone-200 overflow-hidden">
+        <div className="p-4 mt-auto border-t border-stone-800 bg-stone-900/20">
+          <div className="flex items-center gap-3 p-4 mb-4 bg-stone-800/50 rounded-3xl border border-stone-700/50">
+            <div className="w-12 h-12 bg-stone-700 rounded-full flex items-center justify-center text-stone-400 border border-stone-600 overflow-hidden shadow-sm">
               {user?.photoURL ? (
                 <img src={user.photoURL} alt={user.displayName || ''} referrerPolicy="no-referrer" />
               ) : (
-                <UserIcon className="w-6 h-6" />
+                <UserIcon className="w-7 h-7" />
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-stone-900 truncate">{user?.displayName || 'Seeker'}</p>
-              <p className="text-xs text-stone-400 truncate">{user?.email}</p>
+              <p className="text-sm font-bold text-white truncate">{user?.displayName || 'Seeker'}</p>
+              <div className="flex items-center gap-1.5 pt-0.5">
+                <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                <span className="text-[10px] font-bold text-amber-500/80 uppercase tracking-widest">{profile?.streak || 0} Day Streak</span>
+              </div>
             </div>
           </div>
           <button 
             onClick={() => logout()}
-            className="w-full flex items-center gap-3 px-4 py-3 text-stone-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors font-medium"
+            className="w-full flex items-center gap-3 px-5 py-3 text-stone-500 hover:text-red-400 hover:bg-red-900/10 rounded-2xl transition-all font-medium text-sm"
           >
-            <LogOut className="w-5 h-5" />
+            <LogOut className="w-4 h-4" />
             Sign Out
           </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto bg-stone-50">
+      <main className="flex-1 overflow-y-auto overflow-x-hidden bg-[#1c1917] scroll-smooth">
         {children}
       </main>
     </div>

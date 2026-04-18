@@ -45,72 +45,38 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // 0. Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
     // ===============================================================
     // Helper Functions
     // ===============================================================
 
-    function isAuthenticated() {
+    function isSignedIn() {
       return request.auth != null;
     }
 
     function isOwner(userId) {
-      return isAuthenticated() && request.auth.uid == userId;
+      return isSignedIn() && request.auth.uid == userId;
     }
 
+    // Refined isAdmin check to avoid recursive lookup overhead when possible
     function isAdmin() {
-      return isAuthenticated() &&
-        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
-          (request.auth.token.email == "hari310804@gmail.com" && request.auth.token.email_verified == true));
+      return isSignedIn() && (
+        (request.auth.token.email == "hari310804@gmail.com" && request.auth.token.email_verified == true) ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', 'user') == 'admin')
+      );
     }
 
-    function hasRequiredFields(fields) {
-      return request.resource.data.keys().hasAll(fields);
+    function isOwnerOrAdmin(userId) {
+      return isOwner(userId) || isAdmin();
     }
 
-    function hasOnlyAllowedFields(fields) {
-      return request.resource.data.keys().hasOnly(fields);
-    }
-
-    function isValidEmail(email) {
-      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
-    }
-
-    function isValidDateString(dateStr) {
-      return dateStr is string && dateStr.matches("^\\d{4}-\\d{2}-\\d{2}$");
-    }
-
-    // ===============================================================
-    // Domain Validators
-    // ===============================================================
-
-    function isValidUser(data) {
-      return hasRequiredFields(['uid', 'identityStatement']) &&
-             data.uid == request.auth.uid &&
-             data.identityStatement is string && data.identityStatement.size() < 2000 &&
-             (!('email' in data) || isValidEmail(data.email)) &&
-             (!('streak' in data) || data.streak is number) &&
-             (!('vision' in data) || data.vision is string) &&
-             (!('mission' in data) || data.mission is string);
-    }
-
-    function isValidGoal(data) {
-      return hasRequiredFields(['title', 'status']) &&
-             data.title is string && data.title.size() > 0 && data.title.size() < 200 &&
-             data.status in ['active', 'completed', 'archived'] &&
-             (!('description' in data) || data.description is string) &&
-             (!('targetDate' in data) || isValidDateString(data.targetDate));
-    }
-
-    function isValidRitualLog(data) {
-      return hasRequiredFields(['date', 'stepsCompleted']) &&
-             isValidDateString(data.date) &&
-             data.stepsCompleted is list && data.stepsCompleted.size() <= 10 &&
-             (!('reflection' in data) || data.reflection is string && data.reflection.size() < 5000);
-    }
-
-    function isValidStory(data) {
-      return hasRequiredFields(['content']) &&
-             data.content is string && data.content.size() < 50000;
+    function isValidId(id) { 
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); 
     }
 
     // ===============================================================
@@ -118,30 +84,76 @@ service cloud.firestore {
     // ===============================================================
 
     match /users/{userId} {
-      allow read: if isOwner(userId) || isAdmin();
-      allow create: if isOwner(userId) && isValidUser(request.resource.data);
-      allow update: if isOwner(userId) && isValidUser(request.resource.data);
-      allow delete: if isAdmin();
+      // Identity & Profile
+      allow get: if isOwnerOrAdmin(userId);
+      allow list: if isAdmin(); // Users shouldn't list each other
+      
+      allow create: if isOwner(userId) && 
+        request.resource.data.uid == request.auth.uid &&
+        request.resource.data.get('role', 'user') == 'user'; // Prevent self-promotion
+      
+      allow update: if isOwner(userId) && 
+        request.resource.data.uid == request.auth.uid &&
+        // Protect role from modification by owner
+        request.resource.data.get('role', 'user') == resource.data.get('role', 'user');
+
+      // Subcollections
+      
+      match /identities/{id} {
+        allow get, list: if isOwnerOrAdmin(userId);
+        allow create, update, delete: if isOwner(userId);
+      }
+      
+      match /habits/{id} {
+        allow get: if isOwnerOrAdmin(userId);
+        allow list: if isOwnerOrAdmin(userId);
+        allow create, update: if isOwner(userId) && 
+          request.resource.data.identityId is string &&
+          request.resource.data.title is string && request.resource.data.title.size() < 200;
+        allow delete: if isOwner(userId);
+      }
+
+      match /habitLogs/{id} {
+        allow get, list: if isOwnerOrAdmin(userId);
+        allow create, update, delete: if isOwner(userId);
+      }
+
+      match /initiatives/{id} {
+        allow get: if isOwnerOrAdmin(userId);
+        allow list: if isOwnerOrAdmin(userId);
+        allow create, update: if isOwner(userId) && 
+          request.resource.data.name is string && request.resource.data.name.size() < 200 &&
+          request.resource.data.type in ['profit', 'non-profit', 'community'];
+        allow delete: if isOwner(userId);
+      }
+
+      match /books/{id} {
+        allow get: if isOwnerOrAdmin(userId);
+        allow list: if isOwnerOrAdmin(userId);
+        allow create, update: if isOwner(userId) && 
+          request.resource.data.title is string && request.resource.data.title.size() < 200 &&
+          request.resource.data.author is string && request.resource.data.author.size() < 200;
+        allow delete: if isOwner(userId);
+      }
+
+      match /thoughts/{id} {
+        allow get, list: if isOwnerOrAdmin(userId);
+        allow create, update, delete: if isOwner(userId);
+      }
 
       match /goals/{goalId} {
-        allow read: if isOwner(userId);
-        allow create: if isOwner(userId) && isValidGoal(request.resource.data);
-        allow update: if isOwner(userId) && isValidGoal(request.resource.data);
-        allow delete: if isOwner(userId);
+        allow get, list: if isOwnerOrAdmin(userId);
+        allow create, update, delete: if isOwner(userId);
       }
 
       match /rituals/{date} {
-        allow read: if isOwner(userId);
-        allow create: if isOwner(userId) && isValidRitualLog(request.resource.data);
-        allow update: if isOwner(userId) && isValidRitualLog(request.resource.data);
-        allow delete: if isOwner(userId);
+        allow get, list: if isOwnerOrAdmin(userId);
+        allow create, update, delete: if isOwner(userId);
       }
 
       match /stories/{storyId} {
-        allow read: if isOwner(userId);
-        allow create: if isOwner(userId) && isValidStory(request.resource.data);
-        allow update: if isOwner(userId) && isValidStory(request.resource.data);
-        allow delete: if isOwner(userId);
+        allow get, list: if isOwnerOrAdmin(userId);
+        allow create, update, delete: if isOwner(userId);
       }
     }
   }

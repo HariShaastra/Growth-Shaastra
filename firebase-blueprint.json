@@ -2,73 +2,89 @@
   "entities": {
     "User": {
       "title": "User Profile",
-      "description": "Stores user identity, vision, and mission statements.",
+      "description": "Stores user identity, vision, custom settings.",
       "type": "object",
       "properties": {
-        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "uid": { "type": "string" },
         "displayName": { "type": "string" },
         "email": { "type": "string" },
-        "identityStatement": { "type": "string", "description": "The core identity statement" },
-        "vision": { "type": "string", "description": "Long-term vision" },
-        "mission": { "type": "string", "description": "Life mission" },
-        "createdAt": { "type": "string", "format": "date-time" },
-        "streak": { "type": "integer", "description": "Current daily ritual streak" },
-        "lastRitualDate": { "type": "string", "description": "Last date the ritual was completed (YYYY-MM-DD)" }
-      },
-      "required": ["uid", "identityStatement"]
+        "identityStatement": { "type": "string" },
+        "vision": { "type": "string" },
+        "mission": { "type": "string" },
+        "streak": { "type": "integer" },
+        "lastRitualDate": { "type": "string" },
+        "focusTime": { "type": "integer" },
+        "breakTime": { "type": "integer" }
+      }
     },
-    "Goal": {
-      "title": "Goal",
-      "description": "Measurable goals linked to identity.",
+    "GrowthIdentity": {
+      "title": "Identity Card",
+      "description": "Represents a persona the user is building.",
       "type": "object",
       "properties": {
         "title": { "type": "string" },
-        "description": { "type": "string" },
-        "targetDate": { "type": "string", "format": "date" },
-        "status": { "type": "string", "enum": ["active", "completed", "archived"] },
-        "createdAt": { "type": "string", "format": "date-time" }
-      },
-      "required": ["title", "status"]
+        "description": { "type": "string" }
+      }
     },
-    "RitualLog": {
-      "title": "Daily Ritual Log",
-      "description": "Tracks completion of the daily ritual steps.",
+    "Habit": {
+      "title": "Daily Habit",
+      "description": "Systemic actions under an identity.",
       "type": "object",
       "properties": {
-        "date": { "type": "string", "description": "YYYY-MM-DD" },
-        "stepsCompleted": { "type": "array", "items": { "type": "string" } },
-        "reflection": { "type": "string" },
-        "actedAccordingToIdentity": { "type": "boolean" },
-        "timestamp": { "type": "string", "format": "date-time" }
-      },
-      "required": ["date", "stepsCompleted"]
+        "title": { "type": "string" },
+        "identityId": { "type": "string" },
+        "target": { "type": "string" },
+        "cue": { "type": "string" },
+        "reward": { "type": "string" },
+        "difficulty": { "type": "string" }
+      }
     },
-    "LifeStory": {
-      "title": "Life Story",
-      "description": "Narrative career and life path.",
+    "HabitLog": {
+      "title": "Habit Completion Log",
       "type": "object",
       "properties": {
+        "date": { "type": "string" },
+        "habitId": { "type": "string" },
+        "completed": { "type": "boolean" }
+      }
+    },
+    "Initiative": {
+      "title": "Karya Initiative",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "type": { "type": "string" },
+        "stage": { "type": "string" },
+        "problemStatement": { "type": "string" },
+        "solution": { "type": "string" }
+      }
+    },
+    "Book": {
+      "title": "Book Library Item",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "author": { "type": "string" },
+        "status": { "type": "string" }
+      }
+    },
+    "Thought": {
+      "title": "Book Thought",
+      "type": "object",
+      "properties": {
+        "bookId": { "type": "string" },
         "content": { "type": "string" },
-        "updatedAt": { "type": "string", "format": "date-time" }
+        "tag": { "type": "string" }
       }
     }
   },
   "firestore": {
-    "/users/{userId}": {
-      "schema": "User",
-      "description": "User profile and core statements"
-    },
-    "/users/{userId}/goals/{goalId}": {
-      "schema": "Goal",
-      "description": "User's specific goals"
-    },
-    "/users/{userId}/rituals/{date}": {
-      "schema": "RitualLog",
-      "description": "Daily ritual completion logs"
-    },
-    "/users/{userId}/stories/main": {
-      "schema": "LifeStory",
-      "description": "The user's future life story"
-    }
+    "/users/{userId}": { "schema": "User", "description": "Profile settings" },
+    "/users/{userId}/identities/{id}": { "schema": "GrowthIdentity", "description": "Atomic Identities" },
+    "/users/{userId}/habits/{id}": { "schema": "Habit", "description": "Atomic Habits" },
+    "/users/{userId}/habitLogs/{id}": { "schema": "HabitLog", "description": "Daily habit tracking" },
+    "/users/{userId}/initiatives/{id}": { "schema": "Initiative", "description": "Karya Initiatives" },
+    "/users/{userId}/books/{id}": { "schema": "Book", "description": "Book Library" },
+    "/users/{userId}/thoughts/{id}": { "schema": "Thought", "description": "Book Reflection Thoughts" }
   }
 }
