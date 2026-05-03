@@ -53,24 +53,6 @@ export const AtomicModule: React.FC = () => {
     return () => { u1(); u2(); u3(); };
   }, [user]);
 
-  // Auto-creation of Master Persona if missing
-  useEffect(() => {
-    if (user && profile && identities.length === 0 && profile.identityStatement) {
-      const autoCreate = async () => {
-        try {
-          // Check if there are really no identities (double check to avoid race conditions)
-          // We rely on the identities state being populated by the snapshot
-          await addDoc(collection(db, `users/${user.uid}/identities`), { 
-            title: profile.identityStatement.length > 25 ? profile.identityStatement.substring(0, 25) + '...' : profile.identityStatement,
-            description: `Core identity: ${profile.identityStatement}`,
-            createdAt: serverTimestamp() 
-          });
-        } catch (e) { console.error(e); }
-      };
-      autoCreate();
-    }
-  }, [user, profile, identities.length]);
-
   const celebrate = () => {
     setBodhMood('celebrating');
     setBodhMessage('YES! Another vote for your best self! Unstoppable!');
@@ -95,12 +77,12 @@ export const AtomicModule: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-stone-900 via-stone-900/80 to-stone-900/40 p-10 rounded-[4rem] border border-stone-800 flex flex-col md:flex-row items-center gap-10 shadow-3xl">
-         <Mascot mood={bodhMood} className="scale-90 shrink-0" message={bodhMessage} />
-         <div className="space-y-4">
+      <div className="bg-gradient-to-br from-stone-900 via-stone-900/80 to-stone-900/40 p-6 lg:p-10 rounded-[3rem] lg:rounded-[4rem] border border-stone-800 flex flex-col lg:flex-row items-center gap-6 lg:gap-10 shadow-3xl">
+         <Mascot mood={bodhMood} className="scale-75 lg:scale-90 shrink-0" message={bodhMessage} />
+         <div className="space-y-4 text-center lg:text-left">
             <div className="inline-flex bg-amber-600/10 text-amber-500 px-4 py-1 rounded-full text-[10px] font-black tracking-widest uppercase border border-amber-600/20">Daily System</div>
-            <h3 className="text-3xl md:text-4xl font-display text-white">Your Habits</h3>
-            <p className="text-stone-400 font-serif italic text-xl leading-relaxed">Every small action helps you become the person you want to be.</p>
+            <h3 className="text-2xl lg:text-4xl font-display text-white">Your Habits</h3>
+            <p className="text-stone-400 font-serif italic text-lg lg:text-xl leading-relaxed">Every small action helps you become the person you want to be.</p>
          </div>
       </div>
 
@@ -311,6 +293,13 @@ const FocusTimer: React.FC<{ focusTime: number; breakTime: number; habits: Habit
   const [isActive, setIsActive] = useState(false);
   const [mode, setMode] = useState<'focus' | 'break'>('focus');
   const [selectedHabitId, setSelectedHabitId] = useState('');
+
+  // Sync with props when settings change
+  useEffect(() => {
+    if (!isActive) {
+      setTimeLeft((mode === 'focus' ? focusTime : breakTime) * 60);
+    }
+  }, [focusTime, breakTime, mode, isActive]);
 
   useEffect(() => {
     let interval: any = null;

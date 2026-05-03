@@ -52,18 +52,18 @@ export const Dashboard: React.FC<{ onNavigate: (tab: string) => void }> = ({ onN
       {/* 1. Attractive Introductory Box with Bodh */}
       <section className="relative">
         <div className="absolute inset-0 bg-amber-600/10 blur-[120px] rounded-full -z-10 animate-pulse" />
-        <Card className="p-12 md:p-20 bg-stone-900/40 text-white overflow-hidden relative border-stone-800 shadow-[0_0_100px_rgba(0,0,0,0.5)] backdrop-blur-xl rounded-[4rem] border-t-amber-600/20">
+        <Card className="p-8 lg:p-20 bg-stone-900/40 text-white overflow-hidden relative border-stone-800 shadow-[0_0_100px_rgba(0,0,0,0.5)] backdrop-blur-xl rounded-[4rem] border-t-amber-600/20">
           <div className="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none">
             <Shield className="w-96 h-96 text-white rotate-12" />
           </div>
-          <div className="relative z-10 flex flex-col md:flex-row items-center gap-16 text-left">
-            <Mascot mood="happy" className="scale-125" message="Hi! I am Bodh. I'm here to help you get better." />
+          <div className="relative z-10 flex flex-col items-center lg:flex-row lg:items-center gap-12 lg:gap-16 text-center lg:text-left">
+            <Mascot mood="happy" className="scale-100 lg:scale-125" message="Hi! I am Bodh. I'm here to help you get better." />
             <div className="flex-1 space-y-10">
               <div className="space-y-4">
                 <span className="text-amber-500 font-black text-[12px] uppercase tracking-[0.4em]">Simple Plan</span>
-                <h2 className="text-5xl md:text-7xl font-display font-medium tracking-tighter leading-tight italic">Growth Shaastra</h2>
+                <h2 className="text-4xl md:text-5xl lg:text-7xl font-display font-medium tracking-tighter leading-tight italic">Growth Shaastra</h2>
               </div>
-              <p className="text-2xl text-stone-300 font-serif leading-relaxed max-w-2xl italic">
+              <p className="text-xl lg:text-2xl text-stone-300 font-serif leading-relaxed max-w-2xl italic">
                 This is your private space to grow. We help you focus on three simple things: <span className="text-amber-500">Your Mind</span>, <span className="text-amber-500">Your Habits</span>, and <span className="text-amber-500">Your Projects</span>.
               </p>
               <div className="bg-stone-950/60 p-8 rounded-[2.5rem] border border-stone-800/80 shadow-inner">
@@ -227,7 +227,7 @@ const PathStep: React.FC<{
       {completed ? <CheckCircle2 className="w-12 h-12" /> : icon}
     </div>
     
-    <div className="flex-1 pt-3 flex flex-col md:flex-row md:items-center justify-between gap-8 bg-stone-900/20 p-8 rounded-[2.5rem] border border-transparent hover:border-stone-800 transition-all">
+    <div className="flex-1 pt-3 flex flex-col xl:flex-row xl:items-center justify-between gap-8 bg-stone-900/20 p-8 rounded-[2.5rem] border border-transparent hover:border-stone-800 transition-all">
       <div className="space-y-2">
         <div className="flex items-center gap-3 mb-1">
            <span className="text-stone-500 font-mono text-sm tracking-widest">Action {number}</span>
@@ -245,7 +245,7 @@ const PathStep: React.FC<{
         </div>
       </div>
       
-      {active && <Mascot mood={mood} className="hidden md:flex scale-75" message={`Hello! I am Bodh. Let's finish Step ${number} now.`} />}
+      {active && <Mascot mood={mood} className="hidden xl:flex scale-75" message={`Hello! I am Bodh. Let's finish Step ${number} now.`} />}
     </div>
   </motion.div>
 );

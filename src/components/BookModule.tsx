@@ -199,7 +199,7 @@ const ThinkingSpace: React.FC<{ book: Book; onBack: () => void; userId: string }
               initial={{ opacity: 0, y: 100 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 100 }}
-              className="fixed bottom-12 left-0 right-0 p-6 md:left-72 z-40"
+              className="fixed bottom-12 left-0 right-0 p-6 lg:left-72 z-40"
             >
               <div className="max-w-4xl mx-auto">
                 <Card className="shadow-2xl bg-[#1c1917]/95 backdrop-blur-md border-stone-800 p-10 rounded-[3.5rem] shadow-black">

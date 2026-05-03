@@ -21,6 +21,20 @@ export const SettingsModule: React.FC = () => {
     mission: profile?.mission || '',
   });
 
+  // Sync with profile when it's loaded
+  React.useEffect(() => {
+    if (profile) {
+      setFormData({
+        displayName: profile.displayName || '',
+        identityStatement: profile.identityStatement || '',
+        focusTime: profile.focusTime || 25,
+        breakTime: profile.breakTime || 5,
+        vision: profile.vision || '',
+        mission: profile.mission || '',
+      });
+    }
+  }, [profile]);
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -154,7 +168,7 @@ export const SettingsModule: React.FC = () => {
           </div>
         </Card>
 
-        <div className="fixed bottom-12 left-0 right-0 p-8 md:left-72 z-40">
+        <div className="fixed bottom-12 left-0 right-0 p-8 lg:left-72 z-40">
           <div className="max-w-5xl mx-auto flex justify-end">
             <Button 
               className="px-20 py-8 text-2xl bg-amber-600 hover:bg-amber-500 shadow-2xl shadow-amber-900/20 rounded-[2.5rem]" 
