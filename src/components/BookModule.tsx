@@ -7,12 +7,17 @@ import { Book, Thought } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   BookMarked, Plus, Trash2, Library, Send, Hash,
-  ChevronRight, History
+  ChevronRight, History, ArrowLeft, Home
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { Mascot } from './Mascot';
 
-export const BookModule: React.FC = () => {
+interface BookModuleProps {
+  onBack?: () => void;
+  onHome?: () => void;
+}
+
+export const BookModule: React.FC<BookModuleProps> = ({ onBack, onHome }) => {
   const { user } = useAuth();
   const [books, setBooks] = useState<Book[]>([]);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
@@ -34,11 +39,27 @@ export const BookModule: React.FC = () => {
         {!selectedBook ? (
           <motion.div key="library" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-12">
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-8">
-              <div className="space-y-2">
+              <div className="space-y-4">
+                <div className="flex items-center gap-4 mb-2">
+                  <Button 
+                    onClick={onBack} 
+                    variant="outline" 
+                    className="px-5 py-3.5 bg-stone-900 border-2 border-stone-500 text-stone-100 hover:text-amber-500 hover:border-amber-500 hover:bg-stone-800 transition-all font-bold shadow-md rounded-2xl flex items-center justify-center"
+                  >
+                    <ArrowLeft className="w-5 h-5 mr-2" /> Back
+                  </Button>
+                  <Button 
+                    onClick={onHome} 
+                    variant="outline" 
+                    className="px-5 py-3.5 bg-stone-900 border-2 border-stone-500 text-stone-100 hover:text-amber-500 hover:border-amber-500 hover:bg-stone-800 transition-all font-bold shadow-md rounded-2xl flex items-center justify-center"
+                  >
+                    <Home className="w-5 h-5 mr-2" /> Back to Home
+                  </Button>
+                </div>
                 <h1 className="text-4xl md:text-5xl font-display text-white">Reading Room</h1>
                 <p className="text-stone-400 font-serif italic text-lg">"Learn from the best."</p>
               </div>
-              <Button onClick={() => setShowAdd(true)} className="bg-amber-600 hover:bg-amber-500 rounded-2xl px-10 py-5">
+              <Button onClick={() => setShowAdd(true)} className="bg-amber-600 hover:bg-amber-500 text-white rounded-2xl px-10 py-5 font-black shadow-2xl shadow-amber-900/40 ring-2 ring-amber-400/20">
                 <Plus className="w-6 h-6 mr-3" /> New Book
               </Button>
             </header>
@@ -144,8 +165,13 @@ const ThinkingSpace: React.FC<{ book: Book; onBack: () => void; userId: string }
   return (
     <div className="space-y-12 pb-32">
       <div className="flex items-center">
-        <Button variant="ghost" onClick={onBack} size="sm" className="text-stone-500 hover:text-white rounded-2xl">
-          <History className="w-5 h-5 mr-3" /> Shelf
+        <Button 
+          variant="outline" 
+          onClick={onBack} 
+          size="sm" 
+          className="px-5 py-3 bg-stone-900 border-2 border-stone-500 text-stone-100 hover:text-amber-400 hover:border-amber-500 hover:bg-stone-800 transition-all font-bold shadow-md rounded-2xl flex items-center justify-center"
+        >
+          <History className="w-5 h-5 mr-3" /> Back to Shelf
         </Button>
       </div>
 
@@ -199,7 +225,7 @@ const ThinkingSpace: React.FC<{ book: Book; onBack: () => void; userId: string }
               initial={{ opacity: 0, y: 100 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 100 }}
-              className="fixed bottom-12 left-0 right-0 p-6 lg:left-72 z-40"
+              className="fixed bottom-12 left-0 right-0 p-6 xl:left-72 z-40"
             >
               <div className="max-w-4xl mx-auto">
                 <Card className="shadow-2xl bg-[#1c1917]/95 backdrop-blur-md border-stone-800 p-10 rounded-[3.5rem] shadow-black">

@@ -7,12 +7,18 @@ import { Initiative } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Rocket, Briefcase, Users, Heart, 
-  Plus, Activity, Globe, Target, Edit3, MessageCircle
+  Plus, Activity, Globe, Target, Edit3, MessageCircle,
+  ArrowLeft, Home
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { Mascot } from './Mascot';
 
-export const KaryaModule: React.FC = () => {
+interface KaryaModuleProps {
+  onBack?: () => void;
+  onHome?: () => void;
+}
+
+export const KaryaModule: React.FC<KaryaModuleProps> = ({ onBack, onHome }) => {
   const { user } = useAuth();
   const [initiatives, setInitiatives] = useState<Initiative[]>([]);
   const [showAdd, setShowAdd] = useState(false);
@@ -30,11 +36,27 @@ export const KaryaModule: React.FC = () => {
   return (
     <div className="max-w-6xl mx-auto py-12 px-6 space-y-12 overflow-x-hidden">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-8">
-        <div className="space-y-2">
+        <div className="space-y-4">
+          <div className="flex items-center gap-4 mb-2">
+            <Button 
+              onClick={onBack} 
+              variant="outline" 
+              className="px-5 py-3.5 bg-stone-900 border-2 border-stone-500 text-stone-100 hover:text-amber-500 hover:border-amber-500 hover:bg-stone-800 transition-all font-bold shadow-md rounded-2xl flex items-center justify-center"
+            >
+              <ArrowLeft className="w-5 h-5 mr-2" /> Back
+            </Button>
+            <Button 
+              onClick={onHome} 
+              variant="outline" 
+              className="px-5 py-3.5 bg-stone-900 border-2 border-stone-500 text-stone-100 hover:text-amber-500 hover:border-amber-500 hover:bg-stone-800 transition-all font-bold shadow-md rounded-2xl flex items-center justify-center"
+            >
+              <Home className="w-5 h-5 mr-2" /> Back to Home
+            </Button>
+          </div>
           <h1 className="text-4xl md:text-5xl font-display text-white">Big Projects</h1>
           <p className="text-stone-400 font-serif italic text-lg">"Change your world."</p>
         </div>
-        <Button onClick={() => setShowAdd(true)} className="bg-amber-600 hover:bg-amber-500 rounded-2xl px-10 py-5">
+        <Button onClick={() => setShowAdd(true)} className="bg-amber-600 hover:bg-amber-500 text-white rounded-2xl px-10 py-5 font-black shadow-2xl shadow-amber-900/40 ring-2 ring-amber-400/20">
           <Plus className="w-6 h-6 mr-3" /> New Project
         </Button>
       </header>

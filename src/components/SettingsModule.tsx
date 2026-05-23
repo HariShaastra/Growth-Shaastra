@@ -3,12 +3,17 @@ import { useAuth } from '../AuthContext';
 import { db, handleFirestoreError, OperationType } from '../firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { Button, Card } from './UI';
-import { User, Zap, Rocket, Save } from 'lucide-react';
+import { User, Zap, Rocket, Save, ArrowLeft, Home } from 'lucide-react';
 import { motion } from 'motion/react';
 import { cn } from '../lib/utils';
 import { Mascot } from './Mascot';
 
-export const SettingsModule: React.FC = () => {
+interface SettingsModuleProps {
+  onBack?: () => void;
+  onHome?: () => void;
+}
+
+export const SettingsModule: React.FC<SettingsModuleProps> = ({ onBack, onHome }) => {
   const { profile, user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
@@ -54,7 +59,23 @@ export const SettingsModule: React.FC = () => {
 
   return (
     <div className="max-w-5xl mx-auto py-12 px-6 pb-48">
-      <header className="space-y-2 mb-12">
+      <header className="space-y-4 mb-12">
+        <div className="flex items-center gap-4 mb-2">
+          <Button 
+            onClick={onBack} 
+            variant="outline" 
+            className="px-5 py-3.5 bg-stone-900 border-2 border-stone-500 text-stone-100 hover:text-amber-500 hover:border-amber-500 hover:bg-stone-800 transition-all font-bold shadow-md rounded-2xl flex items-center justify-center"
+          >
+            <ArrowLeft className="w-5 h-5 mr-2" /> Back
+          </Button>
+          <Button 
+            onClick={onHome} 
+            variant="outline" 
+            className="px-5 py-3.5 bg-stone-900 border-2 border-stone-500 text-stone-100 hover:text-amber-500 hover:border-amber-500 hover:bg-stone-800 transition-all font-bold shadow-md rounded-2xl flex items-center justify-center"
+          >
+            <Home className="w-5 h-5 mr-2" /> Back to Home
+          </Button>
+        </div>
         <h1 className="text-4xl md:text-5xl font-display text-white">Settings</h1>
         <p className="text-stone-400 font-serif italic text-lg opacity-80">"Fix your system, grow your life."</p>
       </header>
@@ -168,7 +189,7 @@ export const SettingsModule: React.FC = () => {
           </div>
         </Card>
 
-        <div className="fixed bottom-12 left-0 right-0 p-8 lg:left-72 z-40">
+        <div className="fixed bottom-12 left-0 right-0 p-8 xl:left-72 z-40">
           <div className="max-w-5xl mx-auto flex justify-end">
             <Button 
               className="px-20 py-8 text-2xl bg-amber-600 hover:bg-amber-500 shadow-2xl shadow-amber-900/20 rounded-[2.5rem]" 

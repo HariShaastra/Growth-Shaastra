@@ -42,9 +42,9 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTa
   };
 
   return (
-    <div className="min-h-screen bg-[#1c1917] flex flex-col lg:flex-row overflow-x-hidden">
+    <div className="min-h-screen bg-[#1c1917] flex flex-col xl:flex-row overflow-x-hidden">
       {/* Mobile Header */}
-      <header className="lg:hidden bg-[#1c1917]/80 backdrop-blur-md border-b border-stone-800 p-4 flex items-center justify-between sticky top-0 z-50">
+      <header className="xl:hidden bg-[#1c1917]/80 backdrop-blur-md border-b border-stone-800 p-4 flex items-center justify-between sticky top-0 z-50">
         <div className="flex items-center gap-2">
           <Logo className="w-8 h-8" />
           <span className="font-display font-bold text-lg tracking-tight text-[#f5f5f4]">Growth Shaastra</span>
@@ -56,10 +56,10 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTa
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed inset-0 z-40 bg-[#1c1917] lg:relative lg:flex lg:flex-col lg:w-72 border-r border-stone-800 transition-transform duration-300",
-        mobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        "fixed inset-0 z-40 bg-[#1c1917] xl:relative xl:flex xl:flex-col xl:w-72 border-r border-[#2c2927] transition-transform duration-300",
+        mobileMenuOpen ? "translate-x-0" : "-translate-x-full xl:translate-x-0"
       )}>
-        <div className="hidden lg:flex items-center gap-3 p-8 mb-4">
+        <div className="hidden xl:flex items-center gap-3 p-8 mb-4">
           <Logo className="w-10 h-10" />
           <span className="font-display font-bold text-xl tracking-tight text-white">Growth Shaastra</span>
         </div>

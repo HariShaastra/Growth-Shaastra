@@ -6,11 +6,19 @@ import { doc, setDoc, updateDoc, serverTimestamp, increment, collection, query, 
 import { Button, Card } from './UI';
 import { RitualStep } from '../types';
 import { format } from 'date-fns';
-import { ArrowRight, ArrowLeft, RefreshCw, CheckCircle2, Zap } from 'lucide-react';
+import { 
+  ArrowRight, ArrowLeft, RefreshCw, CheckCircle2, Zap, Home
+} from 'lucide-react';
 import { Mascot } from './Mascot';
 import { cn } from '../lib/utils';
 
-export const Ritual: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
+interface RitualProps {
+  onComplete: () => void;
+  onBack?: () => void;
+  onHome?: () => void;
+}
+
+export const Ritual: React.FC<RitualProps> = ({ onComplete, onBack, onHome }) => {
   const { profile, user } = useAuth();
   const [step, setStep] = useState<RitualStep>('identity');
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
@@ -91,6 +99,22 @@ export const Ritual: React.FC<{ onComplete: () => void }> = ({ onComplete }) => 
             className="space-y-12"
           >
             <div className="flex flex-col items-center text-center space-y-8">
+              <div className="flex items-center gap-4 mb-4">
+                <Button 
+                  onClick={onBack} 
+                  variant="outline" 
+                  className="px-5 py-3.5 bg-stone-900 border-2 border-stone-500 text-stone-100 hover:text-amber-500 hover:border-amber-500 hover:bg-stone-800 transition-all font-bold shadow-md rounded-2xl flex items-center justify-center"
+                >
+                  <ArrowLeft className="w-5 h-5 mr-2" /> Back
+                </Button>
+                <Button 
+                  onClick={onHome} 
+                  variant="outline" 
+                  className="px-5 py-3.5 bg-stone-900 border-2 border-stone-500 text-stone-100 hover:text-amber-500 hover:border-amber-500 hover:bg-stone-800 transition-all font-bold shadow-md rounded-2xl flex items-center justify-center"
+                >
+                  <Home className="w-5 h-5 mr-2" /> Back to Home
+                </Button>
+              </div>
               <Mascot mood="peaceful" message="Take a deep breath. Center yourself. Read your truth." />
               <div className="space-y-2">
                 <h1 className="text-4xl md:text-6xl font-display text-white italic tracking-tighter">Identity Anchor</h1>

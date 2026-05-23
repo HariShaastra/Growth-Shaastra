@@ -11,12 +11,18 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay } from '
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Plus, Target, Flame, Zap, Timer, 
-  ChevronRight, ChevronLeft, Check, Grid, List, PlusCircle, RefreshCw
+  ChevronRight, ChevronLeft, Check, Grid, List, PlusCircle, RefreshCw,
+  ArrowLeft, Home
 } from 'lucide-react';
 import { Mascot } from './Mascot';
 import { cn } from '../lib/utils';
 
-export const AtomicModule: React.FC = () => {
+interface AtomicModuleProps {
+  onBack?: () => void;
+  onHome?: () => void;
+}
+
+export const AtomicModule: React.FC<AtomicModuleProps> = ({ onBack, onHome }) => {
   const { user, profile } = useAuth();
   const [identities, setIdentities] = useState<GrowthIdentity[]>([]);
   const [habits, setHabits] = useState<Habit[]>([]);
@@ -26,6 +32,18 @@ export const AtomicModule: React.FC = () => {
   const [showAddHabit, setShowAddHabit] = useState(false);
   const [bodhMood, setBodhMood] = useState<'happy' | 'thinking' | 'excited' | 'peaceful' | 'celebrating'>('excited');
   const [bodhMessage, setBodhMessage] = useState('Hello! I am Bodh. I am here to help you get better every day.');
+  const habitLabRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (activeView === 'habits') {
+      const timer = setTimeout(() => {
+        if (habitLabRef.current) {
+          habitLabRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [activeView]);
 
   useEffect(() => {
     if (!user) return;
@@ -66,6 +84,22 @@ export const AtomicModule: React.FC = () => {
     <div className="max-w-6xl mx-auto py-12 px-6 space-y-12 overflow-x-hidden">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
         <div className="space-y-4">
+          <div className="flex items-center gap-4 mb-2">
+            <Button 
+              onClick={onBack} 
+              variant="outline" 
+              className="px-5 py-3.5 bg-stone-900 border-2 border-stone-500 text-stone-100 hover:text-amber-500 hover:border-amber-500 hover:bg-stone-800 transition-all font-bold shadow-md rounded-2xl flex items-center justify-center"
+            >
+              <ArrowLeft className="w-5 h-5 mr-2" /> Back
+            </Button>
+            <Button 
+              onClick={onHome} 
+              variant="outline" 
+              className="px-5 py-3.5 bg-stone-900 border-2 border-stone-500 text-stone-100 hover:text-amber-500 hover:border-amber-500 hover:bg-stone-800 transition-all font-bold shadow-md rounded-2xl flex items-center justify-center"
+            >
+              <Home className="w-5 h-5 mr-2" /> Back to Home
+            </Button>
+          </div>
           <h1 className="text-4xl md:text-6xl font-display text-white">Everyday Habits</h1>
           <p className="text-stone-400 font-serif italic text-xl border-l-4 border-amber-600 pl-6">"You do not rise to the level of your goals. You fall to the level of your systems."</p>
         </div>
@@ -132,17 +166,17 @@ export const AtomicModule: React.FC = () => {
         )}
 
         {activeView === 'habits' && (
-          <motion.div key="habits" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-10">
+          <motion.div ref={habitLabRef} key="habits" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-10">
             <div className="flex flex-col md:flex-row justify-between items-center gap-6 px-4">
               <div className="space-y-1">
                 <h3 className="text-4xl font-display text-white italic">Habit Lab</h3>
                 <p className="text-stone-500 font-serif italic text-lg tracking-wide">Design your daily systems.</p>
               </div>
               <div className="flex gap-4 w-full md:w-auto">
-                <Button onClick={() => setShowAddIdentity(true)} variant="outline" className="border-stone-800 text-stone-500 px-8 py-4 rounded-2xl hover:text-white flex-1 md:flex-none">
+                <Button onClick={() => setShowAddIdentity(true)} variant="outline" className="border-stone-400 text-stone-200 px-8 py-4 rounded-2xl hover:bg-stone-800 transition-all font-black flex-1 md:flex-none">
                   <PlusCircle className="w-5 h-5 mr-3" /> New Persona
                 </Button>
-                <Button onClick={() => setShowAddHabit(true)} className="bg-amber-600 hover:bg-amber-500 rounded-2xl px-12 py-6 text-xl bg-amber-600 hover:bg-amber-500 shadow-2xl shadow-amber-900/40 flex-1 md:flex-none">
+                <Button onClick={() => setShowAddHabit(true)} className="bg-amber-600 hover:bg-amber-500 text-white rounded-2xl px-12 py-6 text-xl shadow-2xl shadow-amber-900/40 font-black flex-1 md:flex-none ring-2 ring-amber-400/20">
                   <Plus className="w-6 h-6 mr-3" /> Build Loop
                 </Button>
               </div>
@@ -189,7 +223,7 @@ const IdentityCard: React.FC<{ identity: GrowthIdentity; habits: Habit[] }> = ({
 );
 
 const ViewTab: React.FC<{ id: string; label: string; active: boolean; onClick: () => void }> = ({ label, active, onClick }) => (
-  <button onClick={onClick} className={cn("px-10 py-4 rounded-[2rem] text-sm font-bold transition-all whitespace-nowrap", active ? "bg-stone-100 text-stone-900 shadow-xl" : "text-stone-500 hover:text-stone-300 hover:bg-stone-800/50")}>
+  <button onClick={onClick} className={cn("px-10 py-4 rounded-[2rem] text-sm font-black transition-all whitespace-nowrap", active ? "bg-stone-100 text-stone-950 shadow-xl" : "text-stone-300 hover:text-stone-100 hover:bg-stone-800")}>
     {label}
   </button>
 );

@@ -14,6 +14,24 @@ import { SettingsModule } from './components/SettingsModule';
 const AppContent: React.FC = () => {
   const { user, profile, loading, isAuthReady } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [history, setHistory] = useState<string[]>(['dashboard']);
+
+  const navigate = (tab: string) => {
+    setHistory(prev => [...prev, tab]);
+    setActiveTab(tab);
+  };
+
+  const goBack = () => {
+    if (history.length > 1) {
+      const newHistory = [...history];
+      newHistory.pop(); // current tab
+      const lastTab = newHistory[newHistory.length - 1];
+      setHistory(newHistory);
+      setActiveTab(lastTab);
+    } else {
+      setActiveTab('dashboard');
+    }
+  };
 
   if (!isAuthReady || loading) {
     return (
@@ -32,19 +50,25 @@ const AppContent: React.FC = () => {
   }
 
   const renderContent = () => {
+    const commonProps = { 
+      onNavigate: navigate, 
+      onBack: goBack,
+      onHome: () => navigate('dashboard')
+    };
+
     switch (activeTab) {
-      case 'dashboard': return <Dashboard onNavigate={setActiveTab} />;
-      case 'life': return <Ritual onComplete={() => setActiveTab('dashboard')} />;
-      case 'atomic': return <AtomicModule />;
-      case 'karya': return <KaryaModule />;
-      case 'book': return <BookModule />;
-      case 'settings': return <SettingsModule />;
-      default: return <Dashboard onNavigate={setActiveTab} />;
+      case 'dashboard': return <Dashboard onNavigate={navigate} />;
+      case 'life': return <Ritual {...commonProps} onComplete={() => navigate('dashboard')} />;
+      case 'atomic': return <AtomicModule {...commonProps} />;
+      case 'karya': return <KaryaModule {...commonProps} />;
+      case 'book': return <BookModule {...commonProps} />;
+      case 'settings': return <SettingsModule {...commonProps} />;
+      default: return <Dashboard onNavigate={navigate} />;
     }
   };
 
   return (
-    <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
+    <Layout activeTab={activeTab} setActiveTab={navigate}>
       {renderContent()}
     </Layout>
   );

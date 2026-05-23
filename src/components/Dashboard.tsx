@@ -52,18 +52,18 @@ export const Dashboard: React.FC<{ onNavigate: (tab: string) => void }> = ({ onN
       {/* 1. Attractive Introductory Box with Bodh */}
       <section className="relative">
         <div className="absolute inset-0 bg-amber-600/10 blur-[120px] rounded-full -z-10 animate-pulse" />
-        <Card className="p-8 lg:p-20 bg-stone-900/40 text-white overflow-hidden relative border-stone-800 shadow-[0_0_100px_rgba(0,0,0,0.5)] backdrop-blur-xl rounded-[4rem] border-t-amber-600/20">
+        <Card className="p-6 md:p-12 xl:p-20 bg-stone-900/40 text-white overflow-hidden relative border-stone-800 shadow-[0_0_100px_rgba(0,0,0,0.5)] backdrop-blur-xl rounded-[4rem] border-t-amber-600/20">
           <div className="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none">
             <Shield className="w-96 h-96 text-white rotate-12" />
           </div>
-          <div className="relative z-10 flex flex-col items-center lg:flex-row lg:items-center gap-12 lg:gap-16 text-center lg:text-left">
-            <Mascot mood="happy" className="scale-100 lg:scale-125" message="Hi! I am Bodh. I'm here to help you get better." />
+          <div className="relative z-10 flex flex-col items-center xl:flex-row xl:items-center gap-8 xl:gap-16 text-center xl:text-left">
+            <Mascot mood="happy" className="scale-90 md:scale-100 xl:scale-125" message="Hi! I am Bodh. I'm here to help you get better." />
             <div className="flex-1 space-y-10">
               <div className="space-y-4">
                 <span className="text-amber-500 font-black text-[12px] uppercase tracking-[0.4em]">Simple Plan</span>
-                <h2 className="text-4xl md:text-5xl lg:text-7xl font-display font-medium tracking-tighter leading-tight italic">Growth Shaastra</h2>
+                <h2 className="text-3xl md:text-5xl xl:text-7xl font-display font-medium tracking-tighter leading-tight italic">Growth Shaastra</h2>
               </div>
-              <p className="text-xl lg:text-2xl text-stone-300 font-serif leading-relaxed max-w-2xl italic">
+              <p className="text-lg md:text-xl xl:text-2xl text-stone-300 font-serif leading-relaxed max-w-2xl italic">
                 This is your private space to grow. We help you focus on three simple things: <span className="text-amber-500">Your Mind</span>, <span className="text-amber-500">Your Habits</span>, and <span className="text-amber-500">Your Projects</span>.
               </p>
               <div className="bg-stone-950/60 p-8 rounded-[2.5rem] border border-stone-800/80 shadow-inner">
